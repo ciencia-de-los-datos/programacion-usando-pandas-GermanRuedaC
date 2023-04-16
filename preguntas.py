@@ -22,7 +22,9 @@ def pregunta_01():
     40
 
     """
-    return
+    respuesta = tbl0.shape[0]
+    
+    return respuesta
 
 
 def pregunta_02():
@@ -33,7 +35,9 @@ def pregunta_02():
     4
 
     """
-    return
+    respuesta = tbl0.shape[1]
+    
+    return respuesta
 
 
 def pregunta_03():
@@ -50,7 +54,9 @@ def pregunta_03():
     Name: _c1, dtype: int64
 
     """
-    return
+    respuesta = tbl0.groupby('_c1')['_c1'].count()
+    
+    return respuesta
 
 
 def pregunta_04():
@@ -65,7 +71,9 @@ def pregunta_04():
     E    4.785714
     Name: _c2, dtype: float64
     """
-    return
+    respuesta = tbl0.groupby('_c1')['_c2'].mean()
+    
+    return respuesta
 
 
 def pregunta_05():
@@ -82,7 +90,9 @@ def pregunta_05():
     E    9
     Name: _c2, dtype: int64
     """
-    return
+    respuesta = tbl0.groupby('_c1')['_c2'].max()
+    
+    return respuesta
 
 
 def pregunta_06():
@@ -94,7 +104,11 @@ def pregunta_06():
     ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
     """
-    return
+    respuesta = list(tbl1['_c4'].unique())
+    respuesta = [row.upper() for row in respuesta]
+    respuesta.sort(reverse = False)
+    
+    return respuesta
 
 
 def pregunta_07():
@@ -110,7 +124,9 @@ def pregunta_07():
     E    67
     Name: _c2, dtype: int64
     """
-    return
+    respuesta = tbl0.groupby('_c1')['_c2'].sum()
+    
+    return respuesta
 
 
 def pregunta_08():
@@ -128,7 +144,10 @@ def pregunta_08():
     39   39   E    5  1998-01-26    44
 
     """
-    return
+    respuesta = tbl0.copy()
+    respuesta ['suma'] = respuesta['_c0'] + respuesta['_c2']
+    
+    return respuesta
 
 
 def pregunta_09():
@@ -146,7 +165,11 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    return
+    respuesta = tbl0.copy()
+    respuesta ['year'] = respuesta ['_c3'].str.split('-')
+    respuesta ['year'] = [row[0] for row in respuesta ['year']]
+    
+    return respuesta
 
 
 def pregunta_10():
@@ -163,7 +186,13 @@ def pregunta_10():
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
     """
-    return
+    from functools import reduce
+    def sumar(series):
+        return reduce(lambda x, y: str(x) + ':' + str(y), series)
+    y = tbl0.sort_values('_c2')
+    respuesta = y.groupby('_c1').agg({'_c2': sumar})
+    
+    return respuesta
 
 
 def pregunta_11():
@@ -182,7 +211,12 @@ def pregunta_11():
     38   38      d,e
     39   39    a,d,f
     """
-    return
+    respuesta = tbl1.copy()
+    respuesta = respuesta.groupby('_c0', as_index=False).sum()
+    respuesta ['_c4'] = [sorted(row) for row in respuesta ['_c4']]
+    respuesta['_c4'] = respuesta['_c4'].transform(lambda x: ','.join(x))
+    
+    return respuesta
 
 
 def pregunta_12():
@@ -200,7 +234,15 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    return
+    respuesta = tbl2.copy()
+    respuesta["_c5"] = respuesta["_c5a"] + ":" + respuesta["_c5b"].map(str)
+    respuesta = respuesta [['_c0', '_c5']]
+    respuesta = respuesta.groupby(['_c0'], as_index = False).agg({'_c5': ','.join})
+    respuesta['_c5'] = [row.split(",") for row in respuesta['_c5']]
+    respuesta['_c5'] = [sorted(row) for row in respuesta['_c5']]
+    respuesta['_c5'] = [",".join(row) for row in respuesta['_c5']]
+    
+    return respuesta
 
 
 def pregunta_13():
@@ -217,4 +259,9 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    return
+    respuesta = tbl0.merge(tbl2, how='inner', on='_c0')
+    respuesta = respuesta[['_c1', '_c5b']]
+    respuesta = respuesta.groupby('_c1').sum()
+    respuesta = respuesta['_c5b']
+    
+    return respuesta
